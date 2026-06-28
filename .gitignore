@@ -1,0 +1,31 @@
+# Local external dependency
+LIBERO
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environments and packaging
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+
+# Experiment artifacts
+data/
+checkpoints/
+outputs/
+experiments_act/
+runs/
+wandb/
+
+# Logs and media
+*.log
+*.mp4
+*.avi
+*.mov
+

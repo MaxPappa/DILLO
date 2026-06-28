@@ -1,0 +1,22 @@
+# Example stage-2 DILLO configuration. Use the same output root as stage 1.
+stage: stage2
+model_name: google/gemma-3-1b-it
+suite: goal
+train_data: data/libero_goal_video_and_obs/*/*
+act_checkpoint: checkpoints/act/libero_goal/best_model.pth
+use_raw_obs: false
+use_image_obs: false
+is_oracular: false
+chunk_size: 20
+num_chunks: 10
+single_obs_act: true
+projector_type: mlp2x_gelu
+obs_act_pair_fusion: sum
+epochs: 3
+batch_size: 8
+lr: 0.0002
+gradient_accumulation_steps: 1
+eval_every_epochs: 3
+wandb_project: DILLO
+wandb_entity: null
+
