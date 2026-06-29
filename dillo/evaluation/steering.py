@@ -307,8 +307,8 @@ def get_policy_latent(policy, obs_dict, task_emb, latent_source: str = "context"
         first_rgb_key = next(iter(policy.image_encoders.keys()))
         img = obs_dict[first_rgb_key]
         for cam_key, encoder in policy.image_encoders.items():
-            # Match offline LIBEROSuccFailLatentDataset/extract_latent_ale:
-            # the saved agentview frame is fed through each camera encoder.
+            # Match offline latent extraction: the saved agentview frame is
+            # fed through each camera encoder.
             image_tokens.append(encoder(img, langs=task_emb))
         return torch.stack(image_tokens, dim=1).mean(dim=1)
     raise ValueError(f"Unknown latent_source: {latent_source}")

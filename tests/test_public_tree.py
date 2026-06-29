@@ -1,12 +1,30 @@
 from pathlib import Path
+import re
+import subprocess
 
 
 ROOT = Path(__file__).resolve().parents[1]
 
+LOCAL_PATH_RE = re.compile(
+    r"(?<![A-Za-z0-9_.-])/(?:home|Users|media|mnt|scratch|workspace)/[^\s'\"`<>)]*"
+)
+LEGACY_MODULE_RE = re.compile(
+    r"\b(?:policy_explainer|train_policy_explainer|eval_action_refusal)_[a-z0-9_]+\b"
+)
+SUFFIXED_ACT_RE = re.compile(r"\b(?:ACTPolicy|ACTAgent)[A-Z][A-Za-z0-9_]*\b")
+
 
 def _public_text_files():
     suffixes = {".py", ".md", ".sh", ".yaml", ".yml", ".toml"}
-    for path in ROOT.rglob("*"):
+    try:
+        tracked = subprocess.check_output(
+            ["git", "ls-files"], cwd=ROOT, text=True
+        ).splitlines()
+        candidates = [ROOT / rel for rel in tracked]
+    except Exception:
+        candidates = list(ROOT.rglob("*"))
+
+    for path in candidates:
         if path.is_dir() or path.is_symlink() or "__pycache__" in path.parts:
             continue
         if path.suffix in suffixes:
@@ -15,26 +33,23 @@ def _public_text_files():
 
 def test_libero_is_external_reference():
     libero = ROOT / "LIBERO"
-    assert libero.is_symlink()
+    assert libero.is_symlink() or not libero.exists()
 
 
 def test_no_private_names_or_paths():
-    forbidden = [
-        "/" + "home" + "/" + "lucaromani",
-        "/" + "media" + "/" + "pinas",
-        "policy_explainer" + "_libero",
-        "train_policy_explainer" + "_libero.py",
-        "eval_action_refusal" + "_libero.py",
-        "ACTPolicy" + "LIBERO",
-        "ACTPolicy" + "Ale",
-        "ACTAgent" + "Ale",
-    ]
     offenders = []
+    home = Path.home().as_posix()
     for path in _public_text_files():
         text = path.read_text(encoding="utf-8")
-        for token in forbidden:
-            if token in text:
-                offenders.append(f"{path.relative_to(ROOT)}: {token}")
+        rel = path.relative_to(ROOT)
+        if home in text:
+            offenders.append(f"{rel}: contains the current user's home path")
+        for match in LOCAL_PATH_RE.finditer(text):
+            offenders.append(f"{rel}: absolute local path {match.group(0)!r}")
+        for match in LEGACY_MODULE_RE.finditer(text):
+            offenders.append(f"{rel}: legacy module name {match.group(0)!r}")
+        for match in SUFFIXED_ACT_RE.finditer(text):
+            offenders.append(f"{rel}: suffixed ACT symbol {match.group(0)!r}")
     assert offenders == []
 
 

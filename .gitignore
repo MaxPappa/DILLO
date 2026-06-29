@@ -1,5 +1,6 @@
 # Local external dependency
 LIBERO
+external/
 
 # Python
 __pycache__/
@@ -20,6 +21,8 @@ data/
 checkpoints/
 outputs/
 experiments_act/
+libero_datasets/
+val_splits/
 runs/
 wandb/
 
@@ -28,4 +31,3 @@ wandb/
 *.mp4
 *.avi
 *.mov
-

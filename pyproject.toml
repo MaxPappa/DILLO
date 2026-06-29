@@ -7,6 +7,30 @@ name = "dillo"
 version = "0.1.0"
 description = "DILLO training and evaluation code for LIBERO policy explanation."
 requires-python = ">=3.10"
+dependencies = [
+    "accelerate",
+    "easydict",
+    "huggingface-hub",
+    "numpy",
+    "opencv-python",
+    "openai",
+    "peft",
+    "pillow",
+    "pyyaml",
+    "torch",
+    "torchvision",
+    "tqdm",
+    "transformers",
+    "wandb",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+]
+serve = [
+    "vllm",
+]
 
 [tool.setuptools.packages.find]
 include = ["dillo*"]
@@ -14,4 +38,3 @@ include = ["dillo*"]
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
-

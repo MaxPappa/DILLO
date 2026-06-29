@@ -190,7 +190,7 @@ def extract_act_policy_latent(
 ) -> torch.Tensor:
     """
     Extract the policy's latent representation using
-    ActionChunkingPolicy.get_context_latent() (the pinas GMM policy).
+    ActionChunkingPolicy.get_context_latent() from the released ACT policy.
 
     This is the counterpart of extract_latent_act() for data collected with
     dillo.data_generation.collect_dataset / ACTAgent.
