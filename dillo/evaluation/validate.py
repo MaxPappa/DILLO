@@ -48,6 +48,7 @@ from dillo.training.behavior_dataset import (
 )
 from dillo.training.binary_classifier import OfflineACTLatentAgent
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_OUTPUT_ROOT = Path("outputs/validation")
 DEFAULT_VAL_SPLITS_DIR = Path("val_splits")
 
@@ -61,7 +62,32 @@ def load_val_items(suite: str, val_splits_dir: str | Path) -> List[dict]:
             f"Val split not found: {path}. Run split_dataset.py --suite {suite} first."
         )
     with open(path) as f:
-        return json.load(f)
+        items = json.load(f)
+    return [_resolve_item_paths(item) for item in items]
+
+
+def _resolve_repo_path(path_value: Optional[str]) -> Optional[str]:
+    if not path_value:
+        return path_value
+    path = Path(path_value)
+    if path.is_absolute():
+        return str(path)
+    return str(REPO_ROOT / path)
+
+
+def _resolve_item_paths(item: dict) -> dict:
+    item = dict(item)
+    item["image_before_path"] = _resolve_repo_path(item.get("image_before_path"))
+    item["image_after_path"] = _resolve_repo_path(item.get("image_after_path"))
+    return item
+
+
+def checkpoint_tag(checkpoint_dir: str | Path) -> str:
+    ckpt = Path(checkpoint_dir)
+    tag = ckpt.name
+    if tag in {"latentobs", "rawobs", "imageobs"}:
+        tag = ckpt.parent.name
+    return tag
 
 
 def load_policy_explainer(
@@ -222,7 +248,7 @@ def run_eval(args):
 
     # ── Output dir ─────────────────────────────────────────────────
     model_short = Path(args.model_name).name
-    ckpt_ts = Path(args.checkpoint_dir).name  # e.g. "20260225_020021"
+    ckpt_ts = checkpoint_tag(args.checkpoint_dir)  # e.g. "20260225_020021"
     obs_type = "rawobs" if args.use_raw_obs else "latentobs"
     run_tag = f"{args.stage}_{obs_type}_{ckpt_ts}"
     out_dir = (

@@ -72,11 +72,13 @@ conda create -n dillo python=3.10 -y
 conda activate dillo
 ```
 
-Install PyTorch for your CUDA version, then install DILLO:
+Install PyTorch for your CUDA version, then install DILLO. Use PyTorch 2.6 or
+newer for Gemma-3 4B evaluation; older PyTorch versions can fail during
+generation with recent `transformers`.
 
 ```bash
 pip install --upgrade pip
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cu124
 pip install -e ".[dev]"
 ```
 
@@ -87,6 +89,28 @@ a symlink makes it clear that it is an external dependency, not vendored code.
 git clone https://github.com/Lifelong-Robot-Learning/LIBERO.git external/LIBERO
 pip install -e external/LIBERO
 ln -s external/LIBERO LIBERO
+```
+
+The upstream LIBERO package currently does not declare its runtime
+dependencies in `setup.py`. Install the LIBERO robotics stack without
+downgrading DILLO's newer `transformers`, `numpy`, `wandb`, or OpenCV
+dependencies:
+
+```bash
+pip install \
+  hydra-core==1.2.0 \
+  numpy==1.26.4 \
+  opencv-python==4.6.0.66 \
+  robomimic==0.2.0 \
+  einops==0.4.1 \
+  thop==0.1.1-2209072238 \
+  robosuite==1.4.0 \
+  mujoco==2.3.7 \
+  bddl==1.0.1 \
+  future==0.18.2 \
+  matplotlib==3.5.3 \
+  cloudpickle==2.1.0 \
+  gym==0.25.2
 ```
 
 Create the LIBERO path config. Adjust `dataset_dir` if you want the original
@@ -133,7 +157,7 @@ pip install -e ".[serve]"
 Authenticate to Hugging Face if you use gated backbones such as Gemma:
 
 ```bash
-huggingface-cli login
+hf auth login
 ```
 
 ## Artifact Setup
@@ -142,8 +166,17 @@ To use the released DILLO dataset, download it under `data/`:
 
 ```bash
 mkdir -p data
-huggingface-cli download Sapienza/DILLO-LIBERO-dataset \
+hf download Sapienza/DILLO-LIBERO-dataset \
   --repo-type dataset \
+  --local-dir data/DILLO-LIBERO-dataset
+```
+
+To download a single suite, add an include filter, for example:
+
+```bash
+hf download Sapienza/DILLO-LIBERO-dataset \
+  --repo-type dataset \
+  --include "LIBERO_SPATIAL/**" \
   --local-dir data/DILLO-LIBERO-dataset
 ```
 

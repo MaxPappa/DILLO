@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+cd "$REPO_ROOT"
+
 : "${CHECKPOINT_DIR:?Set CHECKPOINT_DIR to a DILLO checkpoint directory}"
 
 SUITE="${SUITE:-goal}"
@@ -15,6 +19,19 @@ OUTPUT_DIR="${OUTPUT_DIR:-}"
 USE_VERDICT_HEAD="${USE_VERDICT_HEAD:-1}"
 USE_RAW_OBS="${USE_RAW_OBS:-0}"
 ACT_CHECKPOINT="${ACT_CHECKPOINT:-}"
+RESUME="${RESUME:-1}"
+
+OBS_TYPE="latentobs"
+if [[ "$USE_RAW_OBS" == "1" ]]; then
+  OBS_TYPE="rawobs"
+fi
+CKPT_TAG="$(basename "$CHECKPOINT_DIR")"
+if [[ "$CKPT_TAG" == "latentobs" || "$CKPT_TAG" == "rawobs" || "$CKPT_TAG" == "imageobs" ]]; then
+  CKPT_TAG="$(basename "$(dirname "$CHECKPOINT_DIR")")"
+fi
+if [[ -z "$OUTPUT_DIR" ]]; then
+  OUTPUT_DIR="$OUTPUT_ROOT/libero_${SUITE_SHORT}/${MODEL_NAME##*/}/${STAGE}_${OBS_TYPE}_${CKPT_TAG}"
+fi
 
 ARGS=(
   --suite "$SUITE_SHORT"
@@ -25,13 +42,14 @@ ARGS=(
   --device "$DEVICE"
   --val_splits_dir "$VAL_SPLITS_DIR"
   --output_root "$OUTPUT_ROOT"
+  --output_dir "$OUTPUT_DIR"
 )
 
-if [[ -n "$OUTPUT_DIR" ]]; then
-  ARGS+=(--output_dir "$OUTPUT_DIR")
-fi
 if [[ "$USE_VERDICT_HEAD" == "1" ]]; then
   ARGS+=(--use_verdict_head)
+fi
+if [[ "$RESUME" == "1" ]]; then
+  ARGS+=(--resume)
 fi
 if [[ "$USE_RAW_OBS" == "1" ]]; then
   ARGS+=(--use_raw_obs)
@@ -41,13 +59,4 @@ fi
 
 python -m dillo.evaluation.validate "${ARGS[@]}" "$@"
 
-PRED_DIR="$OUTPUT_DIR"
-if [[ -z "$PRED_DIR" ]]; then
-  OBS_TYPE="latentobs"
-  if [[ "$USE_RAW_OBS" == "1" ]]; then
-    OBS_TYPE="rawobs"
-  fi
-  PRED_DIR="$OUTPUT_ROOT/libero_${SUITE_SHORT}/${MODEL_NAME##*/}/${STAGE}_${OBS_TYPE}_$(basename "$CHECKPOINT_DIR")"
-fi
-
-python -m dillo.evaluation.metrics --predictions_dir "$PRED_DIR"
+python -m dillo.evaluation.metrics --predictions_dir "$OUTPUT_DIR"

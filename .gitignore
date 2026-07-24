@@ -25,6 +25,7 @@ libero_datasets/
 val_splits/
 runs/
 wandb/
+bert/
 
 # Logs and media
 *.log
