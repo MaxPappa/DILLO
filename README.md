@@ -417,10 +417,13 @@ python -m pytest
 If you find our work or code useful for your research, please cite:
 
 ```bibtex
-@article{pappa2026describe,
+@inproceedings{pappa2026describe,
   title={Describe-Then-Act: Proactive Agent Steering via Distilled Language-Action World Models},
   author={Pappa, Massimiliano and Romani, Luca and Sacco, Valentino and Palma, Alessio and Lathuili{\`e}re, St{\'e}phane and Galasso, Fabio and Alameda-Pineda, Xavier and Spinelli, Indro},
-  journal={arXiv preprint arXiv:2603.23149},
-  year={2026}
+  booktitle={European Conference on Computer Vision (ECCV)},
+  year={2026},
+  eprint={2603.23149},
+  archivePrefix={arXiv},
+  primaryClass={cs.AI}
 }
 ```
