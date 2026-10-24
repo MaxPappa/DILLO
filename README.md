@@ -417,13 +417,27 @@ python -m pytest
 If you find our work or code useful for your research, please cite:
 
 ```bibtex
-@inproceedings{pappa2026describe,
-  title={Describe-Then-Act: Proactive Agent Steering via Distilled Language-Action World Models},
-  author={Pappa, Massimiliano and Romani, Luca and Sacco, Valentino and Palma, Alessio and Lathuili{\`e}re, St{\'e}phane and Galasso, Fabio and Alameda-Pineda, Xavier and Spinelli, Indro},
-  booktitle={European Conference on Computer Vision (ECCV)},
-  year={2026},
-  eprint={2603.23149},
-  archivePrefix={arXiv},
-  primaryClass={cs.AI}
+@InProceedings{10.1007/978-3-032-37350-2_26,
+  author="Pappa, Massimiliano
+  and Romani, Luca
+  and Sacco, Valentino
+  and Palma, Alessio
+  and Lathuili{\`e}re, St{\'e}phane
+  and Galasso, Fabio
+  and Alameda-Pineda, Xavier
+  and Spinelli, Indro",
+  editor="Favaro, Paolo
+  and Kukelova, Zuzana
+  and Maki, Atsuto
+  and Rohrbach, Anna
+  and Schindler, Konrad
+  and Tombari, Federico",
+  title="Describe-Then-Act: Proactive Agent Steering via Distilled Language-Action World Models",
+  booktitle="Computer Vision -- ECCV 2026",
+  year="2026",
+  publisher="Springer Nature Switzerland",
+  address="Cham",
+  pages="472--490",
+  isbn="978-3-032-37350-2"
 }
 ```
